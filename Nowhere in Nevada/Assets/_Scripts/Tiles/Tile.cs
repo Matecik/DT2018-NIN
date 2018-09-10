@@ -2,10 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour {
+public class Tile : MonoBehaviour, IClickable {
 
-	// Use this for initialization
-	void Start () {
+    public void OnClick()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnClickDown()
+    {
+        Debug.Log("HEY YALLL I HAVE BEEN CLCIKED");
+    }
+
+    public void OnClickUp()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	

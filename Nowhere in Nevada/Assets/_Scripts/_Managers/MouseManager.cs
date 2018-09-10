@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class MouseManager : MonoBehaviour {
 
@@ -11,19 +13,48 @@ public class MouseManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        /*
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit)) {
-            Debug.Log(hit.collider.gameObject);
-        }
-        */
-
+        //Performing a 2D Raycast to hit an object
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 
-        if (hit.collider != null)
+        //If the raycast hit something and is also not over UI
+        if (hit.collider != null && !EventSystem.current.IsPointerOverGameObject())
         {
-            Debug.Log("Target Position: " + hit.collider.gameObject.transform.position);
+            if (Input.GetMouseButtonDown(0)) {
+                MouseClickDown(hit);
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                MouseClickUp(hit);
+            }
+            if (Input.GetMouseButton(0))
+            {
+                MouseClick(hit);
+            }
+        }
+    }
+
+    void MouseClickDown(RaycastHit2D hit) {
+        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
+        if (item != null) {
+            item.OnClickDown();
+        }
+    }
+
+    void MouseClickUp(RaycastHit2D hit)
+    {
+        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
+        if (item != null)
+        {
+            item.OnClickUp();
+        }
+    }
+
+    void MouseClick(RaycastHit2D hit)
+    {
+        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
+        if (item != null)
+        {
+            item.OnClick();
         }
     }
 }
