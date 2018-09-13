@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour, IClickable {
+public class Tile : MonoBehaviour, IDragable {
 
     public void OnClick()
     {
@@ -11,10 +11,25 @@ public class Tile : MonoBehaviour, IClickable {
 
     public void OnClickDown()
     {
-        Debug.Log("HEY YALLL I HAVE BEEN CLCIKED");
+        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
     }
 
     public void OnClickUp()
+    {
+        gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+    }
+
+    public void OnDragRelease()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnDragStart()
+    {
+        gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+    }
+
+    public void OnDragUpdate()
     {
         throw new System.NotImplementedException();
     }

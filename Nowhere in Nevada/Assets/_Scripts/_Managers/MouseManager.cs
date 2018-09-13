@@ -3,58 +3,108 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public class MouseManager : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    public float mouseDragDistance = 0.1f;
+
+    // Update is called once per frame
+    void Update()
+    {
         //Performing a 2D Raycast to hit an object
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
 
         //If the raycast hit something and is also not over UI
         if (hit.collider != null && !EventSystem.current.IsPointerOverGameObject())
         {
-            if (Input.GetMouseButtonDown(0)) {
-                MouseClickDown(hit);
-            }
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonDown(0))
             {
-                MouseClickUp(hit);
+                MouseClickDown(hit.collider.gameObject);
             }
-            if (Input.GetMouseButton(0))
-            {
-                MouseClick(hit);
-            }
+        }
+
+        if (Input.GetMouseButton(0)) {
+            MouseHold();
+            Drag();
+        }
+
+        if (Input.GetMouseButtonUp(0)) {
+            MouseUp();
+            EndDrag();
         }
     }
 
-    void MouseClickDown(RaycastHit2D hit) {
-        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
+
+
+    void MouseClickDown(GameObject reciver) {
+        IClickable item = (IClickable)reciver.GetComponent(typeof(IClickable));
         if (item != null) {
             item.OnClickDown();
+            RegisterClick(reciver);
+            mouseDownScreenPos = Input.mousePosition;
         }
     }
 
-    void MouseClickUp(RaycastHit2D hit)
+
+
+    static List<IClickable> clickedObjects = new List<IClickable>();
+    static List<IDragable> draggedObjects = new List<IDragable>();
+    Vector3 mouseDownScreenPos = Vector3.zero;
+
+    void RegisterClick(GameObject clicked) {
+        clickedObjects.Add((IClickable)clicked.GetComponent(typeof(IClickable)));
+    }
+
+    void RegisterDrag(IDragable dragged) {
+        draggedObjects.Add(dragged);
+    }
+
+    void MouseUp()
     {
-        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
-        if (item != null)
-        {
-            item.OnClickUp();
+        foreach (IClickable thing in clickedObjects) {
+            thing.OnClickUp();
+            clickedObjects.Remove(thing);
         }
     }
 
-    void MouseClick(RaycastHit2D hit)
+    void MouseHold()
     {
-        IClickable item = (IClickable)hit.collider.gameObject.GetComponent(typeof(IClickable));
-        if (item != null)
+        foreach (IClickable thing in clickedObjects)
         {
-            item.OnClick();
+            try {
+                thing.OnClick();
+            } 
+            catch
+            {
+
+            }
+
+
+            if (Vector3.Distance(Input.mousePosition, mouseDownScreenPos) > mouseDragDistance && thing is IDragable)
+            {
+                StartDrag((IDragable)thing);
+                RegisterDrag((IDragable)thing);
+            }
+        }
+    }
+
+    void StartDrag (IDragable dragable) {
+        dragable.OnDragStart();
+
+    }
+
+    void Drag () {
+        foreach (IDragable thing in draggedObjects) {
+            thing.OnDragUpdate();
+        }
+    }
+
+    void EndDrag () {
+        foreach (IDragable thing in draggedObjects)
+        {
+            thing.OnDragRelease();
+            draggedObjects.Remove(thing);
         }
     }
 }
