@@ -2,7 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tile : MonoBehaviour, IDragable {
+public class TileCode : MonoBehaviour, IDragable, IMouseOverable
+{
+
+    public void MouseExit()
+    {
+        gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+
+    }
+
+    public void MouseOver()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void MouseEnter()
+    {
+        gameObject.GetComponent<SpriteRenderer>().color = Color.green;
+    }
 
     public void OnClick()
     {

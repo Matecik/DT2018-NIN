@@ -8,12 +8,19 @@ using System;
 public class MouseManager : MonoBehaviour {
 
     public float mouseDragDistance = 0.1f;
+    IMouseOverable mouseOverCurrent;
 
     // Update is called once per frame
     void Update()
     {
         //Performing a 2D Raycast to hit an object
         RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            MouseUp();
+            EndDrag();
+        }
 
         //If the raycast hit something and is also not over UI
         if (hit.collider != null && !EventSystem.current.IsPointerOverGameObject())
@@ -22,16 +29,38 @@ public class MouseManager : MonoBehaviour {
             {
                 MouseClickDown(hit.collider.gameObject);
             }
+            if ((IMouseOverable)hit.collider.gameObject.GetComponent(typeof(IMouseOverable)) != null) {
+                IMouseOverable mouseOver = (IMouseOverable)hit.collider.gameObject.GetComponent(typeof(IMouseOverable));
+                if (mouseOver != null)
+                {
+                    if (mouseOverCurrent != (IMouseOverable)mouseOver)
+                    {
+                        if (mouseOverCurrent != null)
+                        {
+                            mouseOverCurrent.MouseExit();
+                        }
+                        mouseOver.MouseEnter();
+                        mouseOverCurrent = mouseOver;
+                    }
+                    mouseOver.MouseOver();
+                }
+            } else {
+                if (mouseOverCurrent != null) {
+                    mouseOverCurrent.MouseExit();
+                    mouseOverCurrent = null;
+                }
+            }
+        } else {
+            if (mouseOverCurrent != null)
+            {
+                mouseOverCurrent.MouseExit();
+                mouseOverCurrent = null;
+            }
         }
 
         if (Input.GetMouseButton(0)) {
             MouseHold();
             Drag();
-        }
-
-        if (Input.GetMouseButtonUp(0)) {
-            MouseUp();
-            EndDrag();
         }
     }
 
@@ -64,8 +93,8 @@ public class MouseManager : MonoBehaviour {
     {
         foreach (IClickable thing in clickedObjects) {
             thing.OnClickUp();
-            clickedObjects.Remove(thing);
         }
+        clickedObjects.Clear();
     }
 
     void MouseHold()
