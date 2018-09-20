@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileCode : MonoBehaviour, IDragable, IMouseOverable
+public class TileCode : MonoBehaviour, IClickable, IMouseOverable
 {
 
     public void MouseExit()
@@ -13,7 +13,7 @@ public class TileCode : MonoBehaviour, IDragable, IMouseOverable
 
     public void MouseOver()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public void MouseEnter()
@@ -23,7 +23,7 @@ public class TileCode : MonoBehaviour, IDragable, IMouseOverable
 
     public void OnClick()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public void OnClickDown()
@@ -38,7 +38,7 @@ public class TileCode : MonoBehaviour, IDragable, IMouseOverable
 
     public void OnDragRelease()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public void OnDragStart()
@@ -48,7 +48,7 @@ public class TileCode : MonoBehaviour, IDragable, IMouseOverable
 
     public void OnDragUpdate()
     {
-        throw new System.NotImplementedException();
+
     }
 
     // Use this for initialization

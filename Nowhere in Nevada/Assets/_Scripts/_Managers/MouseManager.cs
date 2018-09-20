@@ -19,9 +19,7 @@ public class MouseManager : MonoBehaviour {
         if (Input.GetMouseButtonUp(0))
         {
             MouseUp();
-            EndDrag();
         }
-
         //If the raycast hit something and is also not over UI
         if (hit.collider != null && !EventSystem.current.IsPointerOverGameObject())
         {
@@ -29,8 +27,8 @@ public class MouseManager : MonoBehaviour {
             {
                 MouseClickDown(hit.collider.gameObject);
             }
-            if ((IMouseOverable)hit.collider.gameObject.GetComponent(typeof(IMouseOverable)) != null) {
-                IMouseOverable mouseOver = (IMouseOverable)hit.collider.gameObject.GetComponent(typeof(IMouseOverable));
+            IMouseOverable mouseOver = (IMouseOverable)hit.collider.gameObject.GetComponent(typeof(IMouseOverable));
+            if (mouseOver != null && draggedObjects.Count == 0) {
                 if (mouseOver != null)
                 {
                     if (mouseOverCurrent != (IMouseOverable)mouseOver)
@@ -86,6 +84,9 @@ public class MouseManager : MonoBehaviour {
     }
 
     void RegisterDrag(IDragable dragged) {
+        if (draggedObjects.Contains(dragged)){
+            return;
+        }
         draggedObjects.Add(dragged);
     }
 
@@ -95,6 +96,7 @@ public class MouseManager : MonoBehaviour {
             thing.OnClickUp();
         }
         clickedObjects.Clear();
+        EndDrag();
     }
 
     void MouseHold()
@@ -120,20 +122,32 @@ public class MouseManager : MonoBehaviour {
 
     void StartDrag (IDragable dragable) {
         dragable.OnDragStart();
-
     }
 
     void Drag () {
         foreach (IDragable thing in draggedObjects) {
-            thing.OnDragUpdate();
+            try
+            {
+                thing.OnDragUpdate();
+            }
+            catch (NotImplementedException e)
+            {
+                Debug.LogWarning(e.Message);
+            }
+
         }
     }
 
     void EndDrag () {
         foreach (IDragable thing in draggedObjects)
         {
-            thing.OnDragRelease();
-            draggedObjects.Remove(thing);
+            try
+            {
+                thing.OnDragRelease();
+            } catch (NotImplementedException e) {
+                Debug.LogWarning(e.Message);
+            }
         }
+        draggedObjects.Clear();
     }
 }
