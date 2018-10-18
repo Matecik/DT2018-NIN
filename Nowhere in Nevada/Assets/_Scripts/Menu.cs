@@ -36,4 +36,8 @@ public class Menu : MonoBehaviour {
             color = Color.Lerp(color, targetColor, changeRate * Time.deltaTime);
         }
     }
+
+    public void toggleMode (bool on) {
+        crazyMode = on;
+    }
 }
